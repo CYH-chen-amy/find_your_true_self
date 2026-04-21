@@ -124,11 +124,35 @@
   .cta:hover .arrow { transform: translateX(4px); }
 
   .quiz { padding-top: 1rem; }
-  .progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+  .progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; gap: 1rem; }
   .progress-text { font-family: var(--display); font-style: italic; font-size: 1rem; letter-spacing: .2em; color: var(--ink-mute); }
   .progress-text .current { color: var(--accent); font-size: 1.5rem; font-style: normal; font-family: var(--serif); font-weight: 500; margin-right: .2em; }
   .progress-bar { flex: 1; height: 1px; background: var(--line); margin: 0 1.5rem; position: relative; overflow: hidden; }
   .progress-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--accent); transition: width .8s var(--ease); }
+  /* 返回上一題按鈕 */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    padding: .45rem .9rem;
+    border-radius: 999px;
+    font-family: var(--sans);
+    font-size: .78rem; letter-spacing: .15em;
+    cursor: pointer;
+    transition: all .35s var(--ease);
+  }
+  .back-btn:hover {
+    border-color: var(--accent);
+    color: var(--ink);
+    transform: translateX(-2px);
+  }
+  .back-btn .arrow {
+    display: inline-block;
+    transition: transform .35s var(--ease);
+  }
+  .back-btn:hover .arrow { transform: translateX(-3px); }
+  .back-btn.hidden { visibility: hidden; pointer-events: none; }
 
   .question {
     font-family: var(--serif); font-size: clamp(1.3rem, 2.6vw, 1.7rem);
@@ -397,7 +421,9 @@
       <div class="progress">
         <div class="progress-text"><span class="current" id="qNum">1</span>/ 5</div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
-        <div class="progress-text" style="font-size:.85rem;">SELF AWARENESS</div>
+        <button class="back-btn hidden" id="backBtn" type="button">
+          <span class="arrow">←</span>上一題
+        </button>
       </div>
       <h2 class="question" id="questionText"></h2>
       <div class="options" id="optionsBox"></div>
@@ -602,6 +628,12 @@ function renderQuestion() {
   const q = QUESTIONS[current];
   document.getElementById("qNum").textContent = current + 1;
   document.getElementById("progressFill").style.width = ((current + 1) / QUESTIONS.length * 100) + "%";
+
+  // 第一題隱藏返回按鈕，其他題顯示
+  const backBtn = document.getElementById("backBtn");
+  if (current === 0) backBtn.classList.add("hidden");
+  else backBtn.classList.remove("hidden");
+
   const qEl = document.getElementById("questionText");
   qEl.textContent = q.q;
   qEl.style.animation = "none"; qEl.offsetHeight; qEl.style.animation = "";
@@ -621,6 +653,17 @@ function selectAnswer(score) {
   if (current < QUESTIONS.length) renderQuestion();
   else showResult();
 }
+function goBack() {
+  if (current <= 0) return;
+  answers.pop();        // 把上一題的答案移除
+  current--;
+  renderQuestion();
+}
+// 綁定返回按鈕
+document.getElementById("backBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  goBack();
+});
 function showResult() {
   const total = answers.reduce((a, b) => a + b, 0);
   const result = RESULTS.find(r => total >= r.min && total <= r.max) || RESULTS[0];

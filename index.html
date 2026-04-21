@@ -289,7 +289,7 @@
     </p>
 
     <div>
-      <a href="quiz.html" class="cta">
+      <a href="quiz.html" class="cta" id="ctaQuiz">
         開始自我覺察前測
         <span class="arrow">→</span>
       </a>
@@ -432,6 +432,12 @@
       if (savedTime < bgm.duration) bgm.currentTime = savedTime;
     }, { once: true });
   }
+
+  // 點擊「開始測驗」前：立即存音樂位置（確保 quiz 頁能精準接續）
+  document.getElementById("ctaQuiz").addEventListener("click", () => {
+    sessionStorage.setItem("bgm-time", bgm.currentTime);
+    sessionStorage.setItem("bgm-was-playing", bgm.paused ? "0" : "1");
+  });
 </script>
 
 </body>

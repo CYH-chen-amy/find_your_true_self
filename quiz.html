@@ -237,30 +237,98 @@
   .restart:hover { border-color: var(--accent); color: var(--accent); }
   .footer { text-align: center; margin-top: 4rem; color: var(--ink-mute); font-size: .8rem; letter-spacing: .2em; font-family: var(--display); font-style: italic; }
 
-  /* ===== 右下：音樂按鈕 ===== */
+  /* ===== 右上：時鐘 ===== */
+  @keyframes blink2 { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+  @keyframes fadeUp2 { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .clock {
+    position: fixed; top: 1.5rem; right: 1.5rem;
+    z-index: 50;
+    text-align: right; line-height: 1;
+    animation: fadeUp2 1s var(--ease) .5s both;
+  }
+  .clock .time {
+    font-family: var(--display);
+    font-size: 1.6rem; font-weight: 300;
+    letter-spacing: .1em; color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .clock .time .colon {
+    color: var(--accent); margin: 0 .05em;
+    animation: blink2 1.6s ease-in-out infinite;
+  }
+  .clock .meta {
+    margin-top: .5rem;
+    font-family: var(--display); font-style: italic;
+    font-size: .72rem; letter-spacing: .3em;
+    color: var(--ink-mute); text-transform: uppercase;
+  }
+  .clock .meta .sep {
+    display: inline-block; width: 3px; height: 3px;
+    background: var(--accent); border-radius: 50%;
+    margin: 0 .6em; vertical-align: middle;
+  }
+
+  /* 把 topbar 上的主題按鈕隱藏（移到右下） */
+  .topbar .theme-toggle { display: none; }
+
+  /* ===== 右下：控制按鈕群 ===== */
   @keyframes breathe2 { 0%,100% { opacity: .4; transform: scale(1); } 50% { opacity: .8; transform: scale(1.08); } }
-  .music-ctrl {
+  .controls {
     position: fixed; bottom: 1.5rem; right: 1.5rem;
     z-index: 50;
+    display: flex; gap: .6rem;
+  }
+  .ctrl {
     width: 42px; height: 42px;
     display: inline-flex; align-items: center; justify-content: center;
     background: color-mix(in srgb, var(--paper) 70%, transparent);
     backdrop-filter: blur(8px);
-    border: 1px solid var(--line);
-    color: var(--ink-soft);
+    border: 1px solid var(--line); color: var(--ink-soft);
     border-radius: 50%; cursor: pointer;
     transition: all .35s var(--ease);
-    font-size: 1rem;
+    font-size: 1rem; position: relative;
+    font-family: var(--sans);
   }
-  .music-ctrl:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-2px); }
-  .music-ctrl.playing { color: var(--accent); border-color: var(--accent); position: fixed; }
-  .music-ctrl.playing::before {
+  .ctrl:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-2px); }
+  .ctrl.playing { color: var(--accent); border-color: var(--accent); }
+  .ctrl.playing::before {
     content: ""; position: absolute; inset: -4px;
     border: 1px solid var(--accent); border-radius: 50%;
     animation: breathe2 3s ease-in-out infinite;
   }
+
+  /* 音樂提示氣泡 */
+  .music-hint {
+    position: fixed; bottom: 4.5rem; right: 1.5rem;
+    z-index: 49;
+    background: var(--ink); color: var(--paper);
+    padding: .6rem 1rem; border-radius: 12px;
+    font-family: var(--sans); font-size: .8rem;
+    letter-spacing: .1em;
+    box-shadow: var(--shadow);
+    opacity: 0; transform: translateY(8px);
+    transition: opacity .4s var(--ease), transform .4s var(--ease);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  :root[data-theme="night"] .music-hint { background: var(--accent); color: #0d1326; }
+  .music-hint.show { opacity: 1; transform: translateY(0); }
+  .music-hint::after {
+    content: ""; position: absolute;
+    bottom: -5px; right: 16px;
+    width: 10px; height: 10px;
+    background: inherit;
+    transform: rotate(45deg);
+  }
+
   @media (max-width: 600px) {
-    .music-ctrl { bottom: 1.1rem; right: 1.1rem; width: 38px; height: 38px; }
+    .clock { top: 1.1rem; right: 1.1rem; }
+    .clock .time { font-size: 1.3rem; }
+    .clock .meta { font-size: .62rem; letter-spacing: .25em; margin-top: .4rem; }
+    .controls { bottom: 1.1rem; right: 1.1rem; }
+    .ctrl { width: 38px; height: 38px; }
+    .music-hint { bottom: 4rem; right: 1.1rem; font-size: .75rem; }
   }
 
   @media (max-width: 600px) {
@@ -285,6 +353,16 @@
 <body>
 
 <div class="stage">
+
+  <!-- 右上：日期時間 -->
+  <div class="clock" id="clock">
+    <div class="time" id="clockTime">--<span class="colon">:</span>--</div>
+    <div class="meta">
+      <span id="clockWeekday">---</span>
+      <span class="sep"></span>
+      <span id="clockDate">--.--</span>
+    </div>
+  </div>
 
   <header class="topbar">
     <a href="index.html" class="brand"><span class="back">←</span>回首頁<span class="dot"></span>NYCU LEADERSHIP</a>
@@ -368,8 +446,12 @@
 
 </div>
 
-<!-- 右下：音樂按鈕 -->
-<button class="music-ctrl" id="musicToggle" title="播放/暫停背景音樂" aria-label="背景音樂">♪</button>
+<!-- 右下：控制按鈕（音樂 + 主題） -->
+<div class="music-hint" id="musicHint">點任意處開啟背景音樂 ♪</div>
+<div class="controls">
+  <button class="ctrl" id="musicToggle" title="播放/暫停背景音樂" aria-label="背景音樂">♪</button>
+  <button class="ctrl" id="themeToggle2" title="切換白天/夜晚" aria-label="切換主題">☀</button>
+</div>
 
 <!-- 背景音樂 -->
 <audio id="bgm" loop preload="auto">
@@ -565,20 +647,53 @@ if (new URLSearchParams(location.search).get("start") === "1") {
   setTimeout(() => startQuiz(), 400);
 }
 
+/* ===== 時鐘 ===== */
+const WEEKDAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+const WEEKDAYS_TC = ["週日","週一","週二","週三","週四","週五","週六"];
+function pad(n) { return n < 10 ? "0" + n : "" + n; }
+function tick() {
+  const now = new Date();
+  document.getElementById("clockTime").innerHTML =
+    pad(now.getHours()) + '<span class="colon">:</span>' + pad(now.getMinutes());
+  document.getElementById("clockWeekday").textContent =
+    WEEKDAYS[now.getDay()] + " · " + WEEKDAYS_TC[now.getDay()];
+  document.getElementById("clockDate").textContent =
+    pad(now.getMonth() + 1) + "." + pad(now.getDate());
+}
+tick();
+setInterval(tick, 1000);
+
+/* ===== 右下主題按鈕（與右上時鐘並存） ===== */
+document.getElementById("themeToggle2").addEventListener("click", (e) => {
+  e.stopPropagation();
+  const now = document.documentElement.getAttribute("data-theme");
+  const next = now === "day" ? "night" : "day";
+  applyTheme(next);
+  document.getElementById("themeToggle2").textContent = next === "day" ? "☀" : "☾";
+});
+// 初始化右下主題按鈕的圖示
+(function() {
+  const t = document.documentElement.getAttribute("data-theme");
+  document.getElementById("themeToggle2").textContent = t === "day" ? "☀" : "☾";
+})();
+
 /* ===== 背景音樂（與首頁無縫接續） ===== */
 const bgm = document.getElementById("bgm");
 const musicBtn = document.getElementById("musicToggle");
+const musicHint = document.getElementById("musicHint");
 bgm.volume = 0.45;
 
 let musicEnabled = localStorage.getItem("music-pref") !== "off";
 
-// 從 sessionStorage 讀取上一頁播到哪裡
+// 從 sessionStorage 讀取上一頁播到哪裡，跳到該位置
 const savedTime = parseFloat(sessionStorage.getItem("bgm-time") || "0");
-if (savedTime > 0) {
-  bgm.addEventListener("loadedmetadata", () => {
-    if (savedTime < bgm.duration) bgm.currentTime = savedTime;
-  }, { once: true });
+function seekToSaved() {
+  if (savedTime > 0 && isFinite(bgm.duration) && savedTime < bgm.duration) {
+    try { bgm.currentTime = savedTime; } catch(e) {}
+  }
 }
+if (bgm.readyState >= 1) seekToSaved();
+else bgm.addEventListener("loadedmetadata", seekToSaved, { once: true });
 
 function updateMusicBtn(playing) {
   if (playing) { musicBtn.classList.add("playing"); musicBtn.textContent = "♫"; }
@@ -586,22 +701,39 @@ function updateMusicBtn(playing) {
 }
 
 function tryPlay() {
-  if (!musicEnabled) return;
-  bgm.play().then(() => updateMusicBtn(true)).catch(() => {});
+  if (!musicEnabled) { updateMusicBtn(false); return; }
+  bgm.play().then(() => {
+    updateMusicBtn(true);
+    musicHint.classList.remove("show");
+  }).catch(() => {
+    // 被瀏覽器擋下，等使用者互動
+  });
 }
+// 嘗試播放（多試幾次，因為從首頁帶過來剛互動過，通常會通過）
 tryPlay();
+setTimeout(tryPlay, 300);
+setTimeout(tryPlay, 800);
+
+// 1.5 秒後若還在暫停，顯示提示
+setTimeout(() => {
+  if (musicEnabled && bgm.paused) {
+    musicHint.classList.add("show");
+    setTimeout(() => musicHint.classList.remove("show"), 5000);
+  }
+}, 1500);
 
 // 任何使用者互動都嘗試播放
 function userInteracted() {
   if (musicEnabled && bgm.paused) {
     bgm.play().then(() => updateMusicBtn(true)).catch(() => {});
   }
+  musicHint.classList.remove("show");
 }
-["click", "touchstart", "keydown"].forEach(evt => {
-  document.addEventListener(evt, userInteracted, { once: true, passive: true });
+["click","touchstart","keydown"].forEach(evt => {
+  document.addEventListener(evt, userInteracted, { passive: true });
 });
 
-// 手動切換
+// 手動切換音樂
 musicBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   if (bgm.paused) {
@@ -614,14 +746,13 @@ musicBtn.addEventListener("click", (e) => {
     updateMusicBtn(false);
     localStorage.setItem("music-pref", "off");
   }
+  musicHint.classList.remove("show");
 });
 
-// 持續記錄播放位置（每秒一次）
+// 持續記錄播放位置
 setInterval(() => {
   if (!bgm.paused) sessionStorage.setItem("bgm-time", bgm.currentTime);
 }, 1000);
-
-// 離開頁面前最後存一次
 window.addEventListener("beforeunload", () => {
   sessionStorage.setItem("bgm-time", bgm.currentTime);
 });

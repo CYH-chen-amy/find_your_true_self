@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>自我覺察前測 ｜ 找到生命真正的主人</title>
+<meta name="description" content="自我覺察能力檢測 — 交大領袖社" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --serif: "Noto Serif TC", "Cormorant Garamond", serif;
+    --sans:  "Noto Sans TC", -apple-system, BlinkMacSystemFont, sans-serif;
+    --display: "Cormorant Garamond", "Noto Serif TC", serif;
+    --ease: cubic-bezier(.22,.61,.36,1);
+  }
+  :root[data-theme="day"] {
+    --bg-1: #f5efe4; --bg-2: #ebe2d0; --paper: #fdfaf3;
+    --ink: #25221d; --ink-soft: #5b554a; --ink-mute: #8a8273;
+    --line: #d8cdb6; --accent: #6f8b65; --accent-deep: #4f6a47;
+    --gold: #b08a4a;
+    --shadow: 0 30px 80px -30px rgba(60,45,20,.25), 0 8px 24px -12px rgba(60,45,20,.15);
+    --orb-1: radial-gradient(circle at 30% 30%, #fff7e0, #f1c97a 40%, #c98c3a 75%);
+    --grain-opacity: .35;
+  }
+  :root[data-theme="night"] {
+    --bg-1: #0d1326; --bg-2: #161e3a; --paper: #1a2240;
+    --ink: #ece6d4; --ink-soft: #b9b3a3; --ink-mute: #7a7669;
+    --line: #2c3658; --accent: #c9a961; --accent-deep: #e5c98a;
+    --gold: #e5c98a;
+    --shadow: 0 30px 80px -30px rgba(0,0,0,.6), 0 8px 24px -12px rgba(0,0,0,.4);
+    --orb-1: radial-gradient(circle at 30% 30%, #fff8e0, #ece4c8 35%, #c9a961 75%);
+    --grain-opacity: .55;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--sans); color: var(--ink);
+    background: var(--bg-1); line-height: 1.7;
+    overflow-x: hidden; min-height: 100vh; position: relative;
+    transition: background .9s var(--ease), color .9s var(--ease);
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -2;
+    background:
+      radial-gradient(ellipse at 80% 0%, var(--bg-2), transparent 55%),
+      radial-gradient(ellipse at 20% 100%, var(--bg-2), transparent 50%),
+      var(--bg-1);
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none;
+    z-index: -1; opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .15 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    mix-blend-mode: multiply;
+  }
+  :root[data-theme="night"] body::after { mix-blend-mode: screen; opacity: .25; }
+
+  .stage {
+    max-width: 880px; margin: 0 auto;
+    padding: 2rem 1.5rem 6rem;
+    min-height: 100vh; position: relative; z-index: 1;
+  }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: .25rem 0 2.5rem;
+  }
+  .brand {
+    font-family: var(--serif); font-size: .85rem;
+    letter-spacing: .35em; color: var(--ink-mute);
+    text-transform: uppercase; text-decoration: none;
+    transition: color .3s var(--ease);
+  }
+  .brand:hover { color: var(--ink); }
+  .brand .dot {
+    display: inline-block; width: 6px; height: 6px;
+    background: var(--accent); border-radius: 50%;
+    margin: 0 .8em; vertical-align: middle;
+  }
+  .brand .back { color: var(--accent); margin-right: .4em; }
+  .theme-toggle {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink-soft); padding: .5rem .9rem;
+    border-radius: 999px; font-family: var(--sans);
+    font-size: .8rem; letter-spacing: .15em; cursor: pointer;
+    transition: all .35s var(--ease);
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-1px); }
+
+  .screen { display: none; animation: fadeUp .9s var(--ease) both; }
+  .screen.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes breathe { 0%, 100% { transform: scale(1); opacity: .85; } 50% { transform: scale(1.06); opacity: 1; } }
+  @keyframes drift { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(8px, -10px) rotate(2deg); } }
+
+  .intro { text-align: center; padding-top: 2rem; }
+  .orb {
+    width: 130px; height: 130px; margin: 0 auto 2.5rem;
+    border-radius: 50%; background: var(--orb-1);
+    box-shadow: 0 0 80px -10px var(--accent), inset -8px -8px 30px rgba(0,0,0,.15);
+    animation: breathe 6s ease-in-out infinite, drift 14s ease-in-out infinite;
+  }
+  :root[data-theme="day"] .orb { box-shadow: 0 0 60px -15px #e6b46b, inset -8px -8px 30px rgba(120,80,30,.18); }
+  .eyebrow { font-family: var(--display); font-style: italic; font-size: 1rem; letter-spacing: .3em; color: var(--accent); margin-bottom: 1rem; }
+  h1.title { font-family: var(--serif); font-weight: 500; font-size: clamp(2.4rem, 6vw, 3.8rem); letter-spacing: .08em; line-height: 1.25; color: var(--ink); }
+  .subtitle-en { font-family: var(--display); font-size: clamp(1.1rem, 2vw, 1.4rem); color: var(--ink-mute); margin-top: .8rem; letter-spacing: .15em; font-style: italic; }
+  .divider { width: 60px; height: 1px; background: var(--ink-mute); margin: 2.5rem auto; opacity: .5; }
+  .lead { max-width: 560px; margin: 0 auto; font-size: 1.02rem; color: var(--ink-soft); text-align: justify; text-align-last: center; }
+  .lead strong { color: var(--ink); font-weight: 500; }
+  .hint { margin-top: 2rem; font-size: .9rem; color: var(--ink-mute); font-style: italic; }
+  .cta {
+    display: inline-flex; align-items: center; gap: .8rem;
+    margin-top: 3rem; padding: 1.1rem 2.4rem;
+    background: var(--ink); color: var(--paper);
+    border: none; border-radius: 999px;
+    font-family: var(--serif); font-size: 1.05rem;
+    letter-spacing: .25em; cursor: pointer;
+    transition: all .4s var(--ease); box-shadow: var(--shadow);
+  }
+  :root[data-theme="night"] .cta { background: var(--accent); color: #0d1326; }
+  .cta:hover { transform: translateY(-3px); letter-spacing: .3em; }
+  .cta .arrow { transition: transform .4s var(--ease); }
+  .cta:hover .arrow { transform: translateX(4px); }
+
+  .quiz { padding-top: 1rem; }
+  .progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+  .progress-text { font-family: var(--display); font-style: italic; font-size: 1rem; letter-spacing: .2em; color: var(--ink-mute); }
+  .progress-text .current { color: var(--accent); font-size: 1.5rem; font-style: normal; font-family: var(--serif); font-weight: 500; margin-right: .2em; }
+  .progress-bar { flex: 1; height: 1px; background: var(--line); margin: 0 1.5rem; position: relative; overflow: hidden; }
+  .progress-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--accent); transition: width .8s var(--ease); }
+
+  .question {
+    font-family: var(--serif); font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+    font-weight: 400; line-height: 1.55; color: var(--ink);
+    margin-bottom: 2.5rem; letter-spacing: .04em;
+    animation: fadeUp .7s var(--ease) both;
+  }
+  .question::before {
+    content: "問"; display: inline-block;
+    font-family: var(--serif); font-size: .7em;
+    color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 50%; width: 1.8em; height: 1.8em;
+    line-height: 1.7em; text-align: center;
+    margin-right: .8em; vertical-align: middle;
+    transform: translateY(-.15em);
+  }
+  .options { display: flex; flex-direction: column; gap: 1rem; }
+  .option {
+    display: flex; align-items: flex-start; gap: 1.2rem;
+    padding: 1.2rem 1.4rem; background: var(--paper);
+    border: 1px solid var(--line); border-radius: 14px;
+    cursor: pointer; transition: all .35s var(--ease);
+    text-align: left; color: var(--ink-soft);
+    font-family: var(--sans); font-size: 1rem;
+    line-height: 1.6; width: 100%;
+    animation: fadeUp .6s var(--ease) both;
+  }
+  .option:nth-child(1) { animation-delay: .05s; }
+  .option:nth-child(2) { animation-delay: .12s; }
+  .option:nth-child(3) { animation-delay: .19s; }
+  .option:nth-child(4) { animation-delay: .26s; }
+  .option:hover { border-color: var(--accent); color: var(--ink); transform: translateX(4px); box-shadow: var(--shadow); }
+  .option .label {
+    font-family: var(--display); font-size: 1.4rem; font-style: italic;
+    color: var(--accent); flex-shrink: 0; line-height: 1;
+    margin-top: .15em; transition: transform .35s var(--ease);
+  }
+  .option:hover .label { transform: scale(1.15); }
+
+  .result { text-align: center; padding-top: 1rem; }
+  .result-eyebrow { font-family: var(--display); font-style: italic; color: var(--accent); letter-spacing: .3em; font-size: 1rem; margin-bottom: 1rem; }
+  .score-circle {
+    width: 160px; height: 160px; margin: 0 auto 2rem;
+    border: 1px solid var(--line); border-radius: 50%;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    position: relative;
+    background: radial-gradient(circle, var(--paper), transparent 80%);
+  }
+  .score-circle::before {
+    content: ""; position: absolute; inset: -8px;
+    border: 1px solid var(--accent); border-radius: 50%;
+    opacity: .3; animation: breathe 4s ease-in-out infinite;
+  }
+  .score-num { font-family: var(--display); font-size: 3.5rem; color: var(--ink); line-height: 1; font-weight: 300; }
+  .score-label { font-family: var(--sans); font-size: .75rem; letter-spacing: .3em; color: var(--ink-mute); text-transform: uppercase; margin-top: .5rem; }
+  .level-name { font-family: var(--serif); font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 500; color: var(--ink); margin-bottom: .3rem; letter-spacing: .1em; }
+  .level-en { font-family: var(--display); font-style: italic; color: var(--ink-mute); letter-spacing: .15em; font-size: 1rem; margin-bottom: 2.5rem; }
+
+  .result-card {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 18px; padding: 2.5rem 2rem;
+    text-align: left; box-shadow: var(--shadow); margin-bottom: 2rem;
+  }
+  .result-card h3 {
+    font-family: var(--serif); font-weight: 500;
+    color: var(--accent); font-size: 1.05rem;
+    letter-spacing: .15em; margin-bottom: 1rem;
+    padding-bottom: .8rem; border-bottom: 1px dashed var(--line);
+  }
+  .result-card p { color: var(--ink-soft); font-size: .98rem; margin-bottom: 1rem; line-height: 1.85; }
+  .result-card p:last-child { margin-bottom: 0; }
+  .result-card strong { color: var(--ink); font-weight: 500; }
+  .result-card ol { padding-left: 1.4rem; margin: .8rem 0; }
+  .result-card ol li { color: var(--ink-soft); margin-bottom: .8rem; padding-left: .3rem; }
+  .result-card ol li strong { display: block; color: var(--ink); margin-bottom: .2rem; }
+
+  .event-card {
+    background: linear-gradient(135deg, var(--paper), transparent);
+    border: 1px solid var(--accent); border-radius: 18px;
+    padding: 2rem; text-align: center;
+    margin-bottom: 2rem; position: relative; overflow: hidden;
+  }
+  .event-card::before {
+    content: ""; position: absolute;
+    top: -50%; right: -20%; width: 200px; height: 200px;
+    background: var(--orb-1); opacity: .12;
+    border-radius: 50%; filter: blur(20px);
+  }
+  .event-eyebrow { font-family: var(--display); font-style: italic; color: var(--accent); letter-spacing: .3em; font-size: .9rem; margin-bottom: 1.2rem; position: relative; }
+  .event-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 1.5rem 0; position: relative; }
+  .event-grid > div { border-left: 1px solid var(--line); padding-left: 1rem; }
+  .event-grid > div:first-child { border-left: none; padding-left: 0; }
+  .event-grid .label { font-size: .7rem; letter-spacing: .25em; color: var(--ink-mute); text-transform: uppercase; margin-bottom: .4rem; }
+  .event-grid .value { font-family: var(--serif); font-size: 1.05rem; color: var(--ink); line-height: 1.4; }
+  .event-footer { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--line); font-family: var(--serif); color: var(--ink); font-size: 1rem; letter-spacing: .15em; position: relative; }
+  .event-footer .small { font-family: var(--sans); font-size: .8rem; color: var(--ink-mute); letter-spacing: .15em; margin-top: .3rem; }
+
+  .restart {
+    background: transparent; border: 1px solid var(--ink-soft);
+    color: var(--ink-soft); padding: .9rem 2rem;
+    border-radius: 999px; font-family: var(--sans);
+    font-size: .9rem; letter-spacing: .25em; cursor: pointer;
+    transition: all .35s var(--ease);
+  }
+  .restart:hover { border-color: var(--accent); color: var(--accent); }
+  .footer { text-align: center; margin-top: 4rem; color: var(--ink-mute); font-size: .8rem; letter-spacing: .2em; font-family: var(--display); font-style: italic; }
+
+  @media (max-width: 600px) {
+    .stage { padding: 1.5rem 1.2rem 4rem; }
+    .topbar { padding-bottom: 2rem; }
+    .brand { font-size: .7rem; letter-spacing: .25em; }
+    .orb { width: 100px; height: 100px; margin-bottom: 2rem; }
+    .progress-bar { margin: 0 .8rem; }
+    .progress-text .current { font-size: 1.2rem; }
+    .question { font-size: 1.2rem; }
+    .question::before { font-size: .6em; }
+    .option { padding: 1rem 1.1rem; font-size: .95rem; gap: .9rem; }
+    .option .label { font-size: 1.2rem; }
+    .result-card { padding: 1.8rem 1.4rem; }
+    .event-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .event-grid > div { border-left: none; padding-left: 0; padding-bottom: 1rem; border-bottom: 1px dashed var(--line); }
+    .event-grid > div:last-child { border-bottom: none; padding-bottom: 0; }
+    .cta { padding: 1rem 2rem; font-size: 1rem; letter-spacing: .2em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <header class="topbar">
+    <a href="index.html" class="brand"><span class="back">←</span>回首頁<span class="dot"></span>NYCU LEADERSHIP</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="切換主題">
+      <span id="themeIcon">☀</span>
+      <span id="themeText">DAY</span>
+    </button>
+  </header>
+
+  <section class="screen active" id="screen-intro">
+    <div class="intro">
+      <div class="orb" aria-hidden="true"></div>
+      <div class="eyebrow">A QUIET QUESTIONNAIRE</div>
+      <h1 class="title">自我覺察前測</h1>
+      <div class="subtitle-en">— self awareness check —</div>
+      <div class="divider"></div>
+      <p class="lead">
+        本測驗共 <strong>5 題</strong>，沒有標準答案，<br />
+        請依「最符合你平常狀況」作答。<br /><br />
+        準備好後，我們開始。
+      </p>
+      <p class="hint">約需 2 分鐘 · 完成後將顯示你的覺察階段</p>
+      <button class="cta" onclick="startQuiz()">
+        開始作答
+        <span class="arrow">→</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-quiz">
+    <div class="quiz">
+      <div class="progress">
+        <div class="progress-text"><span class="current" id="qNum">1</span>/ 5</div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
+        <div class="progress-text" style="font-size:.85rem;">SELF AWARENESS</div>
+      </div>
+      <h2 class="question" id="questionText"></h2>
+      <div class="options" id="optionsBox"></div>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-result">
+    <div class="result">
+      <div class="result-eyebrow">YOUR RESULT</div>
+      <div class="score-circle">
+        <div class="score-num" id="scoreNum">0</div>
+        <div class="score-label">/ 20</div>
+      </div>
+      <h2 class="level-name" id="levelName"></h2>
+      <div class="level-en" id="levelEn"></div>
+
+      <div class="result-card" id="resultCard"></div>
+
+      <div class="event-card">
+        <div class="event-eyebrow">— 邀請你來社課 —</div>
+        <div class="event-grid">
+          <div>
+            <div class="label">DATE</div>
+            <div class="value">4 / 23<br>週四</div>
+          </div>
+          <div>
+            <div class="label">TIME</div>
+            <div class="value">19:00 – 21:30<br><span style="font-size:.8rem;color:var(--ink-mute);">18:50 開放報到</span></div>
+          </div>
+          <div>
+            <div class="label">VENUE</div>
+            <div class="value">活動中心<br>429A</div>
+          </div>
+        </div>
+        <div class="event-footer">
+          交大領袖社　歡迎您
+          <div class="small">NYCU LEADERSHIP CLUB</div>
+        </div>
+      </div>
+
+      <button class="restart" onclick="restart()">↻ 重新作答</button>
+    </div>
+  </section>
+
+  <div class="footer">青青草原 · 藍天白雲</div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "你平常會不會主動觀察自己？",
+    options: [
+      "我習慣順著當下直覺或別人的安排",
+      "人生的大轉折時，就會去主動檢視",
+      "我每天會刻意留時間，讓自己沉澱放空",
+      "走路吃飯的時候，我也會關照自己的身心"
+    ]
+  },
+  {
+    q: "當你感覺到自己的情緒起伏（如焦慮、生氣）時，你會：",
+    options: [
+      "雖然覺得有點不舒服，但想不到為什麼，所以就先轉移注意力",
+      "我隱約可以察覺情緒波動，但無法分辨那是什麼情緒",
+      "我能清楚辨識自己當下的情緒",
+      "我不僅能清楚知道我的感受，更能進一步找出原因"
+    ]
+  },
+  {
+    q: "當你壓力很大時，會有何者反應？",
+    options: [
+      "我平常不會特別留意身心變化，想趕快把事情做完～",
+      "我會感覺到明顯的疲憊感或逃避的心情，但不知道怎麼辦",
+      "當我發現自己有壓力的時候，我會先暫停一下，試著找到壓力來源",
+      "我可以提前察覺自己的身心變化，在壓力產生之前，及時做出調整，維持高能量"
+    ]
+  },
+  {
+    q: "當你在學業上感到壓力時，你通常會：",
+    options: [
+      "我會覺得壓力很大，不知道怎麼辦，很想滑手機。",
+      "我知道我壓力很大，但我不知道為什麼。",
+      "我知道壓力源是來自於哪裡，但不一定知道怎麼解開。",
+      "我不僅可以知道壓力源，也可以在發現後有意識的讓自己放鬆。"
+    ]
+  },
+  {
+    q: "當你察覺身體狀態不太好時，你通常會：",
+    options: [
+      "因為實在太忙了，所以我習慣先把眼前的事情忙完。",
+      "儘管有時候身體會不舒服，但我認為是單純的生理疲勞。",
+      "我會先停下手邊的工作好好休息，並思考近期的壓力來源。",
+      "我不僅能找到疲憊的原因，也能有效的調整腳步，時刻保持最佳狀態。"
+    ]
+  }
+];
+
+const RESULTS = [
+  {
+    min: 1, max: 6,
+    name: "自我覺察萌芽期",
+    en: "The Awakening Seed · 1–6 分",
+    html: `
+      <h3>關於你</h3>
+      <p>你不是不敏感，而是太習慣<strong>把感受壓低</strong>。可能從小就學會先配合環境、先完成任務、先當一個「沒問題的人」。久了之後，注意力自然向外，內在反而變成模糊背景。</p>
+      <p>你的人生很容易被三種力量牽動：</p>
+      <ol>
+        <li><strong>身體慣性</strong>累了卻沒休息，餓了沒發現，睡不好還硬撐。身體在承受，但你只感受到「效率下降」。</li>
+        <li><strong>情緒後座力</strong>你不是沒情緒，而是情緒常以拖延、煩躁、注意力渙散、突然爆掉的形式出現。</li>
+        <li><strong>潛意識自動導航</strong>你以為自己在選擇，其實常常只是跟著習慣、壓力和外界期待走。</li>
+      </ol>
+      <h3>給你的提醒</h3>
+      <p>現在的你，最需要的不是「分析」而是「<strong>停下來</strong>」，從自動駕駛當中醒來。重新感覺呼吸、感覺緊繃與鬆開，讓你發現自己原來一直很累，讓你第一次分清楚「我在做事」和「我被推著做事」的差別。</p>
+    `
+  },
+  {
+    min: 7, max: 14,
+    name: "自我覺察探索期",
+    en: "The Inner Explorer · 7–14 分",
+    html: `
+      <h3>關於你</h3>
+      <p>你的覺察開始浮現，但內在系統還沒有整合。你正在從<strong>粗糙的感受，走向清楚的辨識</strong>。不過其實，你以為自己是在理解自己，其實很多時候只是在情緒裡打轉；也就是說，你已經走到「心」的層次，開始碰到情緒，但還沒有真正穿透到「潛意識」的層次，所以你會看到表層反應，卻還抓不到自己的底層模式。</p>
+      <h3>給你的提醒</h3>
+      <p>現在的你，最需要的是可以<strong>清淨潛意識的能力</strong>。透過禪定，你會找到原來壓力不是突然來的，而是長期累積後的結果；原來我表面生氣，底下其實是害怕、委屈、失控感，進而讓能量管理、時間管理、壓力管理得到質的蛻變！</p>
+      <p>來到社課，將細節剖析<strong>身、心、潛意識、靈性</strong>四者的關係，讓你能學會領導自己，成為真正的領袖！</p>
+    `
+  },
+  {
+    min: 15, max: 17,
+    name: "自我覺察實踐者",
+    en: "The Practitioner · 15–17 分",
+    html: `
+      <h3>關於你</h3>
+      <p>這個階段的人，通常已經跨過「不知道自己怎麼了」的階段，進入「<strong>知道了，但改不動</strong>」的階段。這代表你的覺察，已經從身體與情緒，開始往更深的潛意識走。你會發現真正影響你的，往往不是眼前這件事，而是你一直以來對自己的信念、價值觀，或者家庭。</p>
+      <h3>給你的提醒</h3>
+      <p>現在的你，最需要的是<strong>高品質的禪定，清淨意識</strong>。</p>
+      <p>意識的第一層，就是眼、耳、鼻、舌、身、意的<strong>感官意識</strong>。第二層是<strong>記憶意識</strong>，比如有些人對好壞很敏感，人我利害關係都會記下來，牢記別人罵自己的話，伺機報復，這樣不對。我們修行，就是希望把負面的記憶意識趕緊清掉，讓記憶意識都是正面的，這麼一來，「心」就清淨多了。</p>
+      <p>第三層就是<strong>潛意識</strong>。現在意識存在的時候，不可能到潛在意識，一定要經過禪定，才能夠到達潛在意識，讓它清淨。</p>
+    `
+  },
+  {
+    min: 18, max: 20,
+    name: "自我覺察成熟者",
+    en: "The Mature Soul · 18–20 分",
+    html: `
+      <h3>關於你</h3>
+      <p>高分不代表終點。這個階段真正的課題，已經不是「會不會覺察」，而是<strong>你必須保持清楚、持續成長、撐住場面的壓力</strong>。</p>
+      <h3>給你的提醒</h3>
+      <p>現在的你，最需要的是<strong>高品質能量管理的方法</strong>。</p>
+      <p>歡迎你一起來到這堂社課，從禪定當中體會靈性如同<strong>「青青草原，藍天白雲」</strong>般的自在與安詳，找到生命真正的主人。</p>
+    `
+  }
+];
+
+let answers = []; let current = 0;
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  const icon = document.getElementById("themeIcon");
+  const text = document.getElementById("themeText");
+  if (theme === "day") { icon.textContent = "☀"; text.textContent = "DAY"; }
+  else { icon.textContent = "☾"; text.textContent = "NIGHT"; }
+  localStorage.setItem("theme-pref", theme);
+}
+function autoTheme() {
+  const saved = localStorage.getItem("theme-pref");
+  if (saved) { applyTheme(saved); return; }
+  const h = new Date().getHours();
+  applyTheme(h >= 6 && h < 18 ? "day" : "night");
+}
+document.getElementById("themeToggle").addEventListener("click", () => {
+  const now = document.documentElement.getAttribute("data-theme");
+  applyTheme(now === "day" ? "night" : "day");
+});
+autoTheme();
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const el = document.getElementById(id);
+  el.classList.add("active");
+  el.style.animation = "none"; el.offsetHeight; el.style.animation = "";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function startQuiz() {
+  answers = []; current = 0;
+  renderQuestion();
+  showScreen("screen-quiz");
+}
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById("qNum").textContent = current + 1;
+  document.getElementById("progressFill").style.width = ((current + 1) / QUESTIONS.length * 100) + "%";
+  const qEl = document.getElementById("questionText");
+  qEl.textContent = q.q;
+  qEl.style.animation = "none"; qEl.offsetHeight; qEl.style.animation = "";
+  const box = document.getElementById("optionsBox");
+  box.innerHTML = "";
+  const labels = ["a", "b", "c", "d"];
+  q.options.forEach((text, i) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.innerHTML = `<span class="label">${labels[i]}.</span><span class="text">${text}</span>`;
+    btn.addEventListener("click", () => selectAnswer(i + 1));
+    box.appendChild(btn);
+  });
+}
+function selectAnswer(score) {
+  answers.push(score); current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResult();
+}
+function showResult() {
+  const total = answers.reduce((a, b) => a + b, 0);
+  const result = RESULTS.find(r => total >= r.min && total <= r.max) || RESULTS[0];
+  const numEl = document.getElementById("scoreNum");
+  let n = 0;
+  const step = Math.max(1, Math.floor(total / 20));
+  const timer = setInterval(() => {
+    n = Math.min(n + step, total);
+    numEl.textContent = n;
+    if (n >= total) clearInterval(timer);
+  }, 40);
+  document.getElementById("levelName").textContent = result.name;
+  document.getElementById("levelEn").textContent = result.en;
+  document.getElementById("resultCard").innerHTML = result.html;
+  showScreen("screen-result");
+}
+function restart() {
+  answers = []; current = 0;
+  showScreen("screen-intro");
+}
+
+// 從首頁帶 ?start=1 進來，自動開始作答
+if (new URLSearchParams(location.search).get("start") === "1") {
+  setTimeout(() => startQuiz(), 400);
+}
+</script>
+
+</body>
+</html>

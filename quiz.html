@@ -237,6 +237,32 @@
   .restart:hover { border-color: var(--accent); color: var(--accent); }
   .footer { text-align: center; margin-top: 4rem; color: var(--ink-mute); font-size: .8rem; letter-spacing: .2em; font-family: var(--display); font-style: italic; }
 
+  /* ===== 右下：音樂按鈕 ===== */
+  @keyframes breathe2 { 0%,100% { opacity: .4; transform: scale(1); } 50% { opacity: .8; transform: scale(1.08); } }
+  .music-ctrl {
+    position: fixed; bottom: 1.5rem; right: 1.5rem;
+    z-index: 50;
+    width: 42px; height: 42px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--paper) 70%, transparent);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    border-radius: 50%; cursor: pointer;
+    transition: all .35s var(--ease);
+    font-size: 1rem;
+  }
+  .music-ctrl:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-2px); }
+  .music-ctrl.playing { color: var(--accent); border-color: var(--accent); position: fixed; }
+  .music-ctrl.playing::before {
+    content: ""; position: absolute; inset: -4px;
+    border: 1px solid var(--accent); border-radius: 50%;
+    animation: breathe2 3s ease-in-out infinite;
+  }
+  @media (max-width: 600px) {
+    .music-ctrl { bottom: 1.1rem; right: 1.1rem; width: 38px; height: 38px; }
+  }
+
   @media (max-width: 600px) {
     .stage { padding: 1.5rem 1.2rem 4rem; }
     .topbar { padding-bottom: 2rem; }
@@ -341,6 +367,14 @@
   <div class="footer">青青草原 · 藍天白雲</div>
 
 </div>
+
+<!-- 右下：音樂按鈕 -->
+<button class="music-ctrl" id="musicToggle" title="播放/暫停背景音樂" aria-label="背景音樂">♪</button>
+
+<!-- 背景音樂 -->
+<audio id="bgm" loop preload="auto">
+  <source src="bgm.mp3" type="audio/mpeg" />
+</audio>
 
 <script>
 const QUESTIONS = [
@@ -530,6 +564,67 @@ function restart() {
 if (new URLSearchParams(location.search).get("start") === "1") {
   setTimeout(() => startQuiz(), 400);
 }
+
+/* ===== 背景音樂（與首頁無縫接續） ===== */
+const bgm = document.getElementById("bgm");
+const musicBtn = document.getElementById("musicToggle");
+bgm.volume = 0.45;
+
+let musicEnabled = localStorage.getItem("music-pref") !== "off";
+
+// 從 sessionStorage 讀取上一頁播到哪裡
+const savedTime = parseFloat(sessionStorage.getItem("bgm-time") || "0");
+if (savedTime > 0) {
+  bgm.addEventListener("loadedmetadata", () => {
+    if (savedTime < bgm.duration) bgm.currentTime = savedTime;
+  }, { once: true });
+}
+
+function updateMusicBtn(playing) {
+  if (playing) { musicBtn.classList.add("playing"); musicBtn.textContent = "♫"; }
+  else { musicBtn.classList.remove("playing"); musicBtn.textContent = "♪"; }
+}
+
+function tryPlay() {
+  if (!musicEnabled) return;
+  bgm.play().then(() => updateMusicBtn(true)).catch(() => {});
+}
+tryPlay();
+
+// 任何使用者互動都嘗試播放
+function userInteracted() {
+  if (musicEnabled && bgm.paused) {
+    bgm.play().then(() => updateMusicBtn(true)).catch(() => {});
+  }
+}
+["click", "touchstart", "keydown"].forEach(evt => {
+  document.addEventListener(evt, userInteracted, { once: true, passive: true });
+});
+
+// 手動切換
+musicBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (bgm.paused) {
+    musicEnabled = true;
+    bgm.play().then(() => updateMusicBtn(true)).catch(() => {});
+    localStorage.setItem("music-pref", "on");
+  } else {
+    bgm.pause();
+    musicEnabled = false;
+    updateMusicBtn(false);
+    localStorage.setItem("music-pref", "off");
+  }
+});
+
+// 持續記錄播放位置（每秒一次）
+setInterval(() => {
+  if (!bgm.paused) sessionStorage.setItem("bgm-time", bgm.currentTime);
+}, 1000);
+
+// 離開頁面前最後存一次
+window.addEventListener("beforeunload", () => {
+  sessionStorage.setItem("bgm-time", bgm.currentTime);
+});
 </script>
 
 </body>

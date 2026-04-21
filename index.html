@@ -416,6 +416,22 @@
     }
     musicHint.classList.remove("show");
   });
+
+  // 跨頁同步：持續記錄播放位置
+  setInterval(() => {
+    if (!bgm.paused) sessionStorage.setItem("bgm-time", bgm.currentTime);
+  }, 1000);
+  window.addEventListener("beforeunload", () => {
+    sessionStorage.setItem("bgm-time", bgm.currentTime);
+  });
+
+  // 從 quiz 頁返回時：接續上次的播放位置
+  const savedTime = parseFloat(sessionStorage.getItem("bgm-time") || "0");
+  if (savedTime > 0) {
+    bgm.addEventListener("loadedmetadata", () => {
+      if (savedTime < bgm.duration) bgm.currentTime = savedTime;
+    }, { once: true });
+  }
 </script>
 
 </body>

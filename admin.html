@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>後台 ｜ 找到生命真正的主人</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&family=Noto+Sans+TC:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-1: #f5efe4; --bg-2: #ebe2d0; --paper: #fdfaf3;
+    --ink: #25221d; --ink-soft: #5b554a; --ink-mute: #8a8273;
+    --line: #d8cdb6; --accent: #6f8b65;
+    --shadow: 0 30px 80px -30px rgba(60,45,20,.2);
+    --serif: "Noto Serif TC", serif;
+    --sans: "Noto Sans TC", -apple-system, sans-serif;
+    --display: "Cormorant Garamond", serif;
+    --mono: "JetBrains Mono", "Menlo", monospace;
+    --ease: cubic-bezier(.22,.61,.36,1);
+  }
+  :root[data-theme="night"] {
+    --bg-1: #0d1326; --bg-2: #161e3a; --paper: #1a2240;
+    --ink: #ece6d4; --ink-soft: #b9b3a3; --ink-mute: #7a7669;
+    --line: #2c3658; --accent: #c9a961;
+    --shadow: 0 30px 80px -30px rgba(0,0,0,.6);
+  }
+  /* 各等級的色彩標籤 */
+  .level-tag[data-level="自我覺察萌芽期"] { background: #fce8d2; color: #8a5a2a; border-color: #e8c89a; }
+  .level-tag[data-level="自我覺察探索期"] { background: #e3edd9; color: #4f6a47; border-color: #b5cba0; }
+  .level-tag[data-level="自我覺察實踐者"] { background: #d6e6e0; color: #2f6157; border-color: #95c2b6; }
+  .level-tag[data-level="自我覺察成熟者"] { background: #e8dcf0; color: #5b3d75; border-color: #c0a8d4; }
+  :root[data-theme="night"] .level-tag[data-level="自我覺察萌芽期"] { background: #4a3a25; color: #f1c97a; border-color: #6e5a3d; }
+  :root[data-theme="night"] .level-tag[data-level="自我覺察探索期"] { background: #2d3e2a; color: #a8c898; border-color: #4f6a47; }
+  :root[data-theme="night"] .level-tag[data-level="自我覺察實踐者"] { background: #25403a; color: #95c2b6; border-color: #3d6258; }
+  :root[data-theme="night"] .level-tag[data-level="自我覺察成熟者"] { background: #3d2d4f; color: #c0a8d4; border-color: #5b3d75; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg-1); color: var(--ink);
+    line-height: 1.6; min-height: 100vh;
+    transition: background .6s var(--ease), color .6s var(--ease);
+  }
+
+  /* === 登入畫面 === */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem;
+  }
+  .login-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 3rem 2.5rem;
+    box-shadow: var(--shadow);
+    max-width: 380px; width: 100%;
+    text-align: center;
+  }
+  .login-card .lock {
+    font-size: 2rem; color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .login-card h1 {
+    font-family: var(--serif); font-weight: 500;
+    font-size: 1.4rem; letter-spacing: .1em;
+    margin-bottom: .3rem;
+  }
+  .login-card .sub {
+    font-family: var(--display); font-style: italic;
+    color: var(--ink-mute); letter-spacing: .2em;
+    font-size: .85rem; margin-bottom: 2rem;
+  }
+  .login-card input {
+    width: 100%;
+    padding: .9rem 1.1rem;
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-family: var(--sans); font-size: 1rem;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+  .login-card input:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+  .login-card button {
+    width: 100%;
+    padding: .9rem;
+    background: var(--ink); color: var(--paper);
+    border: none; border-radius: 12px;
+    font-family: var(--serif); font-size: 1rem;
+    letter-spacing: .2em; cursor: pointer;
+    transition: opacity .3s;
+  }
+  :root[data-theme="night"] .login-card button { background: var(--accent); color: #0d1326; }
+  .login-card button:hover { opacity: .85; }
+  .login-card .err {
+    color: #c66; font-size: .85rem; margin-top: .8rem; min-height: 1.2em;
+  }
+
+  /* === 後台畫面 === */
+  .admin {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  .admin-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--line);
+    gap: 1rem; flex-wrap: wrap;
+  }
+  .admin-header h1 {
+    font-family: var(--serif); font-weight: 500;
+    font-size: 1.4rem; letter-spacing: .12em;
+  }
+  .admin-header h1 .sub {
+    display: block;
+    font-family: var(--display); font-style: italic;
+    font-size: .8rem; color: var(--ink-mute);
+    letter-spacing: .25em; margin-top: .3rem;
+  }
+  .admin-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
+  .btn {
+    padding: .55rem 1.1rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    font-family: var(--sans); font-size: .85rem;
+    letter-spacing: .1em; cursor: pointer;
+    transition: all .3s var(--ease);
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: .4rem;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--ink); }
+  .btn.primary {
+    background: var(--accent); color: var(--paper);
+    border-color: var(--accent);
+  }
+  :root[data-theme="night"] .btn.primary { color: #0d1326; }
+  .btn.primary:hover { opacity: .9; color: var(--paper); }
+  :root[data-theme="night"] .btn.primary:hover { color: #0d1326; }
+
+  /* 統計卡片 */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .stat-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.4rem 1.5rem;
+  }
+  .stat-card .label {
+    font-family: var(--display); font-style: italic;
+    font-size: .8rem; letter-spacing: .25em;
+    color: var(--ink-mute); text-transform: uppercase;
+    margin-bottom: .4rem;
+  }
+  .stat-card .value {
+    font-family: var(--display);
+    font-size: 2.4rem; font-weight: 300;
+    color: var(--ink); line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-card .value .small {
+    font-family: var(--sans); font-size: .9rem;
+    color: var(--ink-mute); margin-left: .3em;
+  }
+  .stat-card.dist .value { font-size: 1.4rem; }
+  .stat-card .bar {
+    margin-top: .6rem;
+    display: flex; height: 6px;
+    border-radius: 3px; overflow: hidden;
+    background: var(--bg-1);
+  }
+  .stat-card .bar > span {
+    transition: flex .6s var(--ease);
+  }
+  .stat-card .legend {
+    margin-top: .6rem;
+    display: flex; flex-wrap: wrap; gap: .6rem;
+    font-size: .72rem; color: var(--ink-soft);
+  }
+  .stat-card .legend .dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: .3em;
+    vertical-align: middle;
+  }
+
+  /* 表格 */
+  .table-wrap {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .table-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.4rem;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .search-box {
+    flex: 1; max-width: 360px;
+    position: relative;
+  }
+  .search-box input {
+    width: 100%;
+    padding: .55rem 1rem .55rem 2.4rem;
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-family: var(--sans); font-size: .9rem;
+    color: var(--ink);
+  }
+  .search-box input:focus { outline: none; border-color: var(--accent); }
+  .search-box::before {
+    content: "⌕"; position: absolute;
+    left: .9rem; top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-mute); font-size: 1.1rem;
+  }
+  .count {
+    font-family: var(--display); font-style: italic;
+    color: var(--ink-mute); font-size: .85rem;
+    letter-spacing: .15em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .92rem;
+  }
+  th, td {
+    padding: .9rem 1.2rem;
+    text-align: left;
+    vertical-align: middle;
+  }
+  th {
+    background: var(--bg-1);
+    font-family: var(--serif); font-weight: 500;
+    font-size: .8rem; letter-spacing: .15em;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  th:hover { color: var(--ink); }
+  th .sort-icon { color: var(--accent); margin-left: .3em; opacity: 0; font-size: .8em; }
+  th.sorted .sort-icon { opacity: 1; }
+  td {
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-soft);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+  td.name { color: var(--ink); font-weight: 500; }
+  td.score { font-family: var(--display); font-size: 1.2rem; color: var(--ink); }
+  td.id { font-family: var(--mono); font-size: .85rem; }
+  td.time { font-family: var(--mono); font-size: .8rem; color: var(--ink-mute); white-space: nowrap; }
+
+  .level-tag {
+    display: inline-block;
+    padding: .25rem .7rem;
+    border: 1px solid;
+    border-radius: 999px;
+    font-size: .78rem;
+    letter-spacing: .05em;
+    white-space: nowrap;
+  }
+
+  .answer-cells { font-family: var(--mono); font-size: .85rem; color: var(--ink-mute); letter-spacing: .15em; }
+
+  .empty {
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--ink-mute);
+    font-family: var(--display); font-style: italic;
+    letter-spacing: .15em;
+  }
+  .empty .icon { font-size: 2rem; margin-bottom: 1rem; opacity: .5; }
+
+  .loading {
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--ink-mute);
+  }
+
+  @media (max-width: 768px) {
+    .admin { padding: 1rem; }
+    .admin-header h1 { font-size: 1.2rem; }
+    th, td { padding: .7rem .8rem; font-size: .85rem; }
+    .table-wrap { overflow-x: auto; }
+    table { min-width: 720px; }
+  }
+
+  /* 主題切換 */
+  .theme-fab {
+    position: fixed; bottom: 1.2rem; right: 1.2rem;
+    width: 40px; height: 40px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 50%; cursor: pointer;
+    color: var(--ink-soft);
+    z-index: 100;
+    transition: all .3s var(--ease);
+  }
+  .theme-fab:hover { border-color: var(--accent); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- 登入畫面 -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="lock">⌘</div>
+    <h1>後台管理</h1>
+    <div class="sub">— admin —</div>
+    <input type="password" id="pwInput" placeholder="輸入密碼" autocomplete="off" />
+    <button onclick="tryLogin()">進入</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- 後台畫面 -->
+<div class="admin" id="adminWrap" style="display:none;">
+  <div class="admin-header">
+    <h1>
+      自我覺察前測 後台
+      <span class="sub">SELF-AWARENESS QUIZ DASHBOARD</span>
+    </h1>
+    <div class="admin-actions">
+      <button class="btn" onclick="loadData()" title="重新整理">↻ 重新整理</button>
+      <button class="btn primary" onclick="exportCSV()">⬇ 匯出 CSV</button>
+      <button class="btn" onclick="logout()">登出</button>
+    </div>
+  </div>
+
+  <!-- 統計卡片 -->
+  <div class="stats" id="stats"></div>
+
+  <!-- 資料表 -->
+  <div class="table-wrap">
+    <div class="table-toolbar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="搜尋姓名 / 學號 / 等級…" oninput="filterTable()" />
+      </div>
+      <div class="count" id="countInfo">— 筆</div>
+    </div>
+    <div id="tableContent">
+      <div class="loading">載入中⋯</div>
+    </div>
+  </div>
+</div>
+
+<button class="theme-fab" id="themeFab" title="切換白天/夜晚">☀</button>
+
+<!-- Firebase + 後台邏輯 -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, orderBy }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ⚠️ 把下面換成你的 Firebase config（與 quiz.html 同一份）
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.__loadData = async () => {
+    const q = query(collection(db, "quiz_responses"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    const rows = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      rows.push({
+        id: doc.id,
+        name: d.name || "",
+        studentId: d.studentId || "",
+        score: d.score ?? 0,
+        level: d.level || "",
+        levelEn: d.levelEn || "",
+        answers: d.answers || [],
+        createdAt: d.createdAt?.toDate?.() || null
+      });
+    });
+    return rows;
+  };
+</script>
+
+<script>
+  // ⚠️ 後台密碼（自己改一個強一點的）
+  const ADMIN_PASSWORD = "leadership2025";
+
+  // ===== 登入 =====
+  function tryLogin() {
+    const pw = document.getElementById("pwInput").value;
+    const err = document.getElementById("loginErr");
+    if (pw === ADMIN_PASSWORD) {
+      sessionStorage.setItem("admin-ok", "1");
+      enterAdmin();
+    } else {
+      err.textContent = "密碼錯誤";
+      setTimeout(() => err.textContent = "", 2500);
+    }
+  }
+  document.getElementById("pwInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") tryLogin();
+  });
+
+  function enterAdmin() {
+    document.getElementById("loginWrap").style.display = "none";
+    document.getElementById("adminWrap").style.display = "block";
+    loadData();
+  }
+  function logout() {
+    sessionStorage.removeItem("admin-ok");
+    location.reload();
+  }
+  // 自動登入（同一 session）
+  if (sessionStorage.getItem("admin-ok") === "1") enterAdmin();
+
+  // ===== 主題 =====
+  function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    document.getElementById("themeFab").textContent = t === "night" ? "☾" : "☀";
+    localStorage.setItem("theme-pref", t);
+  }
+  (function() {
+    const saved = localStorage.getItem("theme-pref");
+    if (saved) applyTheme(saved);
+    else applyTheme(new Date().getHours() >= 6 && new Date().getHours() < 18 ? "day" : "night");
+  })();
+  document.getElementById("themeFab").addEventListener("click", () => {
+    const now = document.documentElement.getAttribute("data-theme");
+    applyTheme(now === "night" ? "day" : "night");
+  });
+
+  // ===== 資料 =====
+  let allRows = [];
+  let sortKey = "createdAt";
+  let sortDir = "desc";
+
+  async function loadData() {
+    document.getElementById("tableContent").innerHTML = '<div class="loading">載入中⋯</div>';
+    try {
+      allRows = await window.__loadData();
+      renderStats();
+      renderTable();
+    } catch (err) {
+      console.error(err);
+      document.getElementById("tableContent").innerHTML =
+        '<div class="empty"><div class="icon">⚠</div>讀取失敗：' + err.message + '<br><br>請檢查 Firebase config 與 Firestore 權限規則</div>';
+    }
+  }
+
+  // ===== 統計 =====
+  const LEVELS = [
+    { name: "自我覺察萌芽期", color: "#e8c89a" },
+    { name: "自我覺察探索期", color: "#a8c898" },
+    { name: "自我覺察實踐者", color: "#95c2b6" },
+    { name: "自我覺察成熟者", color: "#c0a8d4" }
+  ];
+
+  function renderStats() {
+    const total = allRows.length;
+    const avgScore = total ? (allRows.reduce((a, r) => a + r.score, 0) / total).toFixed(1) : "—";
+
+    // 等級分布
+    const dist = {};
+    LEVELS.forEach(l => dist[l.name] = 0);
+    allRows.forEach(r => { if (dist[r.level] !== undefined) dist[r.level]++; });
+
+    // 今日新增
+    const today = new Date();
+    const todayCount = allRows.filter(r => {
+      if (!r.createdAt) return false;
+      return r.createdAt.toDateString() === today.toDateString();
+    }).length;
+
+    const statsEl = document.getElementById("stats");
+    statsEl.innerHTML = `
+      <div class="stat-card">
+        <div class="label">TOTAL</div>
+        <div class="value">${total}<span class="small">人</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">TODAY</div>
+        <div class="value">${todayCount}<span class="small">人</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">AVG SCORE</div>
+        <div class="value">${avgScore}<span class="small">/ 20</span></div>
+      </div>
+      <div class="stat-card dist" style="grid-column: span 2;">
+        <div class="label">DISTRIBUTION</div>
+        <div class="bar">
+          ${LEVELS.map(l => `<span style="flex:${dist[l.name] || 0.001};background:${l.color}"></span>`).join("")}
+        </div>
+        <div class="legend">
+          ${LEVELS.map(l => `<span><span class="dot" style="background:${l.color}"></span>${l.name.replace("自我覺察","")} ${dist[l.name]}</span>`).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== 表格 =====
+  function renderTable() {
+    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+    let rows = allRows;
+    if (keyword) {
+      rows = rows.filter(r =>
+        r.name.toLowerCase().includes(keyword) ||
+        r.studentId.toLowerCase().includes(keyword) ||
+        r.level.toLowerCase().includes(keyword)
+      );
+    }
+
+    // 排序
+    rows = [...rows].sort((a, b) => {
+      let av = a[sortKey], bv = b[sortKey];
+      if (sortKey === "createdAt") { av = av?.getTime() || 0; bv = bv?.getTime() || 0; }
+      if (typeof av === "string") { av = av.toLowerCase(); bv = bv.toLowerCase(); }
+      if (av < bv) return sortDir === "asc" ? -1 : 1;
+      if (av > bv) return sortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    document.getElementById("countInfo").textContent =
+      `${rows.length}${keyword ? ` / ${allRows.length}` : ""} 筆`;
+
+    if (rows.length === 0) {
+      document.getElementById("tableContent").innerHTML =
+        '<div class="empty"><div class="icon">∅</div>' +
+        (allRows.length === 0 ? "尚無資料" : "沒有符合條件的結果") +
+        '</div>';
+      return;
+    }
+
+    const headers = [
+      { key: "createdAt", label: "時間" },
+      { key: "name", label: "姓名" },
+      { key: "studentId", label: "學號" },
+      { key: "score", label: "分數" },
+      { key: "level", label: "等級" },
+      { key: "answers", label: "答案", noSort: true }
+    ];
+
+    let html = '<table><thead><tr>';
+    headers.forEach(h => {
+      const isSorted = sortKey === h.key;
+      const icon = h.noSort ? "" : `<span class="sort-icon">${isSorted ? (sortDir === "asc" ? "↑" : "↓") : "↕"}</span>`;
+      html += `<th class="${isSorted ? "sorted" : ""}" ${h.noSort ? "" : `onclick="setSort('${h.key}')"`}>${h.label}${icon}</th>`;
+    });
+    html += "</tr></thead><tbody>";
+
+    rows.forEach(r => {
+      html += `<tr>
+        <td class="time">${formatTime(r.createdAt)}</td>
+        <td class="name">${escapeHtml(r.name)}</td>
+        <td class="id">${escapeHtml(r.studentId)}</td>
+        <td class="score">${r.score}</td>
+        <td><span class="level-tag" data-level="${escapeHtml(r.level)}">${escapeHtml(r.level)}</span></td>
+        <td class="answer-cells">${r.answers.map(a => ["a","b","c","d"][a-1] || "?").join(" ")}</td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+
+    document.getElementById("tableContent").innerHTML = html;
+  }
+
+  function setSort(key) {
+    if (sortKey === key) sortDir = sortDir === "asc" ? "desc" : "asc";
+    else { sortKey = key; sortDir = "desc"; }
+    renderTable();
+  }
+  window.setSort = setSort;
+
+  function filterTable() { renderTable(); }
+  window.filterTable = filterTable;
+
+  function formatTime(d) {
+    if (!d) return "—";
+    const pad = n => n < 10 ? "0" + n : n;
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  function escapeHtml(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  // ===== 匯出 CSV =====
+  function exportCSV() {
+    if (allRows.length === 0) { alert("沒有資料可以匯出"); return; }
+    const headers = ["時間","姓名","學號","分數","等級","Q1","Q2","Q3","Q4","Q5"];
+    const lines = [headers.join(",")];
+    allRows.forEach(r => {
+      const row = [
+        formatTime(r.createdAt),
+        csvEscape(r.name),
+        csvEscape(r.studentId),
+        r.score,
+        csvEscape(r.level),
+        ...[0,1,2,3,4].map(i => r.answers[i] ?? "")
+      ];
+      lines.push(row.join(","));
+    });
+    // 加 BOM 讓 Excel 正確顯示中文
+    const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const ts = new Date().toISOString().slice(0,16).replace(/[:T]/g,"-");
+    a.href = url; a.download = `quiz-results-${ts}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  }
+  function csvEscape(s) {
+    s = String(s ?? "");
+    if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
+  window.exportCSV = exportCSV;
+  window.tryLogin = tryLogin;
+  window.logout = logout;
+  window.loadData = loadData;
+</script>
+
+</body>
+</html>
